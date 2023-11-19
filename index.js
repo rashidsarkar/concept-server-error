@@ -3,7 +3,7 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 const morgan = require("morgan");
 const port = process.env.PORT || 8000;
@@ -102,6 +102,17 @@ async function run() {
     app.get("/api/rooms", async (req, res) => {
       try {
         const result = await roomsCollection.find().toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    app.get("/api/singleRoomData/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const result = await roomsCollection.findOne(filter);
         res.send(result);
       } catch (error) {
         console.error("Error fetching rooms:", error);
